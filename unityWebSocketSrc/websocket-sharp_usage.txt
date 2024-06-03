@@ -1,0 +1,151 @@
+https://github.com/sta/websocket-sharp
+
+You should add your websocket-sharp.dll (e.g. /path/to/websocket-sharp/bin/Debug/websocket-sharp.dll) to the library references of your project.
+
+If you would like to use that dll in your Unity project, you should add it to any folder of your project (e.g. Assets/Plugins) in the Unity Editor.
+
+
+using System;
+using WebSocketSharp;
+
+namespace Example
+{
+  public class Program
+  {
+    public static void Main (string[] args)
+    {
+      using (var ws = new WebSocket ("ws://dragonsnest.far/Laputa")) {
+        ws.OnMessage += (sender, e) =>
+                          Console.WriteLine ("Laputa says: " + e.Data);
+
+        ws.Connect ();
+        ws.Send ("BALUS");
+        Console.ReadKey (true);
+      }
+    }
+  }
+}
+Step 1
+Required namespace.
+
+using WebSocketSharp;
+The WebSocket class exists in the WebSocketSharp namespace.
+
+Step 2
+Creating a new instance of the WebSocket class with the WebSocket URL to connect.
+
+var ws = new WebSocket ("ws://example.com");
+The WebSocket class inherits the System.IDisposable interface, so you can create it with the using statement.
+
+using (var ws = new WebSocket ("ws://example.com")) {
+  ...
+}
+This will close the WebSocket connection with status code 1001 (going away) when the control leaves the using block.
+
+Step 3
+Setting the WebSocket events.
+
+WebSocket.OnOpen Event
+This event occurs when the WebSocket connection has been established.
+
+ws.OnOpen += (sender, e) => {
+               ...
+             };
+System.EventArgs.Empty is passed as e, so you do not need to use it.
+
+WebSocket.OnMessage Event
+This event occurs when the WebSocket instance receives a message.
+
+ws.OnMessage += (sender, e) => {
+                  ...
+                };
+A WebSocketSharp.MessageEventArgs instance is passed as e.
+
+If you would like to get the message data, you should access e.Data or e.RawData property.
+
+e.Data property returns a string, so it is mainly used to get the text message data.
+
+e.RawData property returns a byte[], so it is mainly used to get the binary message data.
+
+if (e.IsText) {
+  // Do something with e.Data.
+  ...
+
+  return;
+}
+
+if (e.IsBinary) {
+  // Do something with e.RawData.
+  ...
+
+  return;
+}
+And if you would like to notify that a ping has been received, via this event, you should set the WebSocket.EmitOnPing property to true.
+
+ws.EmitOnPing = true;
+ws.OnMessage += (sender, e) => {
+                  if (e.IsPing) {
+                    // Do something to notify that a ping has been received.
+                    ...
+
+                    return;
+                  }
+                };
+WebSocket.OnError Event
+This event occurs when the WebSocket instance gets an error.
+
+ws.OnError += (sender, e) => {
+                ...
+              };
+A WebSocketSharp.ErrorEventArgs instance is passed as e.
+
+If you would like to get the error message, you should access e.Message property.
+
+e.Message property returns a string that represents the error message.
+
+And e.Exception property returns a System.Exception instance that represents the cause of the error if it is due to an exception.
+
+WebSocket.OnClose Event
+This event occurs when the WebSocket connection has been closed.
+
+ws.OnClose += (sender, e) => {
+                ...
+              };
+A WebSocketSharp.CloseEventArgs instance is passed as e.
+
+If you would like to get the reason for the close, you should access e.Code or e.Reason property.
+
+e.Code property returns a ushort that represents the status code for the close.
+
+e.Reason property returns a string that represents the reason for the close.
+
+Step 4
+Connecting to the WebSocket server.
+
+ws.Connect ();
+If you would like to connect to the server asynchronously, you should use the WebSocket.ConnectAsync () method.
+
+Step 5
+Sending data to the WebSocket server.
+
+ws.Send (data);
+The WebSocket.Send method is overloaded.
+
+You can use the WebSocket.Send (string), WebSocket.Send (byte[]), WebSocket.Send (System.IO.FileInfo), or WebSocket.Send (System.IO.Stream, int) method to send the data.
+
+If you would like to send the data asynchronously, you should use the WebSocket.SendAsync method.
+
+ws.SendAsync (data, completed);
+And also if you would like to do something when the send is complete, you should set completed to any Action<bool> delegate.
+
+Step 6
+Closing the WebSocket connection.
+
+ws.Close (code, reason);
+If you would like to close the connection explicitly, you should use the WebSocket.Close method.
+
+The WebSocket.Close method is overloaded.
+
+You can use the WebSocket.Close (), WebSocket.Close (ushort), WebSocket.Close (WebSocketSharp.CloseStatusCode), WebSocket.Close (ushort, string), or WebSocket.Close (WebSocketSharp.CloseStatusCode, string) method to close the connection.
+
+If you would like to close the connection asynchronously, you should use the WebSocket.CloseAsync method.
